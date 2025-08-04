@@ -1,67 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-import { fetchWithAuth } from "../../utils/fetchWithAuth";
+import {getAllCountries, getAllStates} from '../../services/apiService'
 
 export default function CountryDetails({ formData, setFormData }) {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
 
-  const getAllCountries = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetchWithAuth(
-  "https://reactinterviewtask.codetentaclestechnologies.in/api/api/country-list",
-  {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-
-      const data = await res.json();
-      if (data?.data) {
-        const formatted = data.data.map((c) => ({
-          value: c.id,
-          label: c.name,
-        }));
-        setCountries(formatted);
-      }
-    } catch (err) {
-      console.error("Error fetching countries:", err);
-    }
-  };
-
-  const getAllStates = async (countryId) => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetchWithAuth(
-  `https://reactinterviewtask.codetentaclestechnologies.in/api/api/state-list?country_id=${countryId}`,
-  {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-
-      const data = await res.json();
-      if (data?.data) {
-        const formatted = data.data.map((s) => ({
-          value: s.id,
-          label: s.name,
-        }));
-        setStates(formatted);
-      }
-    } catch (err) {
-      console.error("Error fetching states:", err);
-    }
-  };
-
+ 
   useEffect(() => {
-    getAllCountries();
+    getAllCountries(setCountries);
   }, []);
 
   return (
@@ -93,7 +40,7 @@ export default function CountryDetails({ formData, setFormData }) {
       state: null,
     }));
     console.log(formData)
-    getAllStates(value.value);
+    getAllStates(value.value, setStates);
   }}
 />
 

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoleContext } from "../context/RoleContext";
+import { login } from "../services/apiService";
 
 export default function Login() {
   const {setRole} = useContext(RoleContext)
@@ -15,41 +16,7 @@ export default function Login() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const login = async (e) => {
-    e.preventDefault();
-    setError("");
 
-    try {
-      const response = await fetch(
-        "https://reactinterviewtask.codetentaclestechnologies.in/api/api/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-      debugger  
-      localStorage.setItem("role", data.role); 
-      setRole(data.role); 
-      localStorage.setItem("token", data.token);
-
-      if (data.role === "Admin") {
-        navigate("/List");
-      } else {
-        navigate("/Product")
-      }
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
   return (
     <section
@@ -73,7 +40,7 @@ export default function Login() {
                 </h3>
               </div>
 
-              <form className="pt-8 rounded" onSubmit={login}>
+              <form className="pt-8 rounded" onSubmit={(e) => login(e, formData, setError, setRole, navigate)}>
                 <div className="mb-4">
                   <input
                     className="w-full px-3 py-3 text-sm leading-normal text-gray-50 border-0 bg-[#ffffff1a] rounded shadow appearance-none focus:outline-none focus:shadow-outline"

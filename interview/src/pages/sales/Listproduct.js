@@ -4,6 +4,7 @@ import Layout from "../../component/Layout";
 import { Link } from "react-router-dom";
 import { RoleContext } from "../../context/RoleContext";
 import { fetchWithAuth } from "../../utils/fetchWithAuth";
+import { getProductList } from "../../services/apiService";
 
 export default function Product() {
   const {role} = useContext(RoleContext)
@@ -15,10 +16,10 @@ export default function Product() {
       title: "Product Image",
       dataIndex: "productimg",
       key: "productimg",
-      render: () => (
+      render: (e) => (
         <div className="m-auto flex justify-center">
           <img
-            src="/assets/image/shirt.webp"
+            src={e.image ||"/assets/image/shirt.webp" }
             alt="productimg"
             width="50px"
             height="50px"
@@ -36,47 +37,21 @@ export default function Product() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
-  const getProductList = async (pageNo = page, perPage = rowsPerPage) => {
-    const token = localStorage.getItem("token");
 
-    try {
-      const result = await fetchWithAuth(
-  `https://reactinterviewtask.codetentaclestechnologies.in/api/api/product-list?page=${pageNo}&perPage=${perPage}`,
-  {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-
-
-      if (!result.ok) throw new Error(`Error: ${result.status}`);
-
-      const resData = await result.json();
-
-      setData(resData.data);
-      setPage(resData.currentPage || pageNo);
-      setRowsPerPage(resData.perPage || perPage);
-      setTotalPages(resData.lastPage || 1);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-    }
-  };
 
   const handlePageChange = (event, value) => {
     setPage(value);
-    getProductList(value, rowsPerPage);
+    getProductList(value, rowsPerPage, setData, setPage, setRowsPerPage, setTotalPages);
   };
 
   const handleRowsPerPageChange = (value) => {
     setRowsPerPage(Number(value));
     setPage(1);
-    getProductList(1, value);
+    getProductList(1, value, setData, setPage, setRowsPerPage, setTotalPages);
   };
 
   useEffect(() => {
-    getProductList(page, rowsPerPage);
+    getProductList(page, rowsPerPage, setData, setPage, setRowsPerPage, setTotalPages);
   }, [page, rowsPerPage]);
 
   return (

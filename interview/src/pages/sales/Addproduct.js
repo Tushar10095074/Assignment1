@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Layout from "../../component/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth";
+import { handleAddProduct } from "../../services/apiService";
 
 export default function Addproduct() {
   const [formData, setFormData] = useState({
@@ -22,43 +23,7 @@ export default function Addproduct() {
     setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!formData.name || !formData.description || !formData.price || !formData.image) {
-      alert("Please fill all fields and select an image");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    const payload = new FormData();
-    payload.append("name", formData.name);
-    payload.append("description", formData.description);
-    payload.append("price", formData.price);
-    payload.append("image", formData.image);
-
-    try {
-      const res = await fetchWithAuth(
-  "https://reactinterviewtask.codetentaclestechnologies.in/api/api/add-product",
-  {
-    method: "POST",
-    body: payload,
-  }
-);
-
-
-      const result = await res.json();
-
-      if (res.ok) {
-        alert("Product added successfully!");
-        navigate("/Product");
-      } else {
-        alert(result.message || "Failed to add product");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  };
 
   return (
     <Layout>
@@ -72,7 +37,7 @@ export default function Addproduct() {
       <div className="bg-white">
         <div className="p-4 rounded-lg dark:border-gray-700">
           <div className="w-full">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => handleAddProduct(e, formData, alert, navigate)}>
               <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium text-gray-700 text-left">
                   Product Name
